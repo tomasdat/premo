@@ -30,6 +30,7 @@ a { color:var(--acc); cursor:pointer; text-decoration:none; } a:hover { text-dec
 nav { display:flex; gap:4px; margin-left:12px; }
 nav button { background:none; border:none; border-bottom:2px solid transparent; border-radius:0; padding:8px 14px; color:var(--mut); }
 nav button.active { color:var(--text); border-bottom-color:var(--acc); }
+.feedback-link { border:1px solid var(--line); border-radius:6px; padding:7px 10px; white-space:nowrap; }
 .syncbar { background:var(--chip); padding:6px 20px; text-align:center; font-size:13px; }
 main { max-width:1180px; margin:auto; padding:20px; }
 
