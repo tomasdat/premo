@@ -467,6 +467,14 @@ async function renderManage() {
     api("/suggestions?min_games=3").catch(() => []),
     api(`/squads/suggestions?${q()}`).catch(() => []),
   ]);
+  const drafts = [...view.querySelectorAll("input")].map((input) => ({
+    id: input.id,
+    account: input.dataset.accIn,
+    value: input.value,
+    focused: input === document.activeElement,
+    start: input.selectionStart,
+    end: input.selectionEnd,
+  }));
   const initial = (n) => esc((n || "?")[0].toUpperCase());
   view.innerHTML = `
     ${squadSugg.length ? `<div class="sect">Suggested squads <span style="text-transform:none">(people who often play on the same team${queue() ? "" : ", all queues"})</span></div>
@@ -497,6 +505,16 @@ async function renderManage() {
     <div class="card"><div class="row"><input id="sn" placeholder="Squad name" style="flex:1;min-width:180px"></div>
       <div class="chips" id="sqpick">${players.map((p) => `<button class="pickchip" data-pid="${p.id}">${esc(p.name)}</button>`).join("") || '<span class="mut">Add people first</span>'}</div>
       <div class="row" style="margin:10px 0 0"><button id="addS" class="primary">Create squad</button><span class="mut">Pick 2 or more people</span></div></div>`;
+
+  drafts.forEach((draft) => {
+    const input = draft.id ? document.getElementById(draft.id) : view.querySelector(`[data-acc-in="${draft.account}"]`);
+    if (!input) return;
+    input.value = draft.value;
+    if (draft.focused) {
+      input.focus();
+      input.setSelectionRange(draft.start, draft.end);
+    }
+  });
 
   const run = (fn, ok) => async (e) => {
     try { const r = await fn(e); await loadPlayers(); if (ok) toast(typeof ok === "function" ? ok(r) : ok); render(); }
@@ -534,13 +552,13 @@ async function renderManage() {
     if (rid) await api(`/players/${p.id}/accounts`, { method: "POST", body: { riot_id: rid } });
   }, "Person added");
   $("#addP").onclick = addPerson;
-  [$("#pn"), $("#pa")].forEach((i) => (i.onkeydown = (e) => e.key === "Enter" && addPerson()));
+  [$("#pn"), $("#pa")].forEach((i) => (i.onkeydown = (e) => { if (e.key === "Enter") addPerson(); }));
 
   view.querySelectorAll("[data-add-acc]").forEach((b) => {
     const input = view.querySelector(`[data-acc-in="${b.dataset.addAcc}"]`);
     const go = run(() => api(`/players/${b.dataset.addAcc}/accounts`, { method: "POST", body: { riot_id: input.value } }), "Account added. Press Sync to download its matches.");
     b.onclick = go;
-    input.onkeydown = (e) => e.key === "Enter" && go();
+    input.onkeydown = (e) => { if (e.key === "Enter") go(); };
   });
   view.querySelectorAll("[data-del-acc]").forEach((a) => (a.onclick = run(() => confirm("Remove this account?") && api(`/accounts/${encodeURIComponent(a.dataset.delAcc)}`, { method: "DELETE" }))));
   view.querySelectorAll("[data-del-player]").forEach((a) => (a.onclick = run(() => confirm("Remove this person and their accounts?") && api(`/players/${a.dataset.delPlayer}`, { method: "DELETE" }))));
