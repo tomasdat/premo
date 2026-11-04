@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Premo</title>
+<script>document.documentElement.dataset.theme=localStorage.getItem("premo-theme")||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark")</script>
+<link rel="stylesheet" href="/static/style.css?v=57">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="logo">⚔ Pre<span>mo</span></div>
+    <nav>
+      <button data-tab="squads" class="active">Squads</button>
+      <button data-tab="players">Players</button>
+      <button data-tab="manage" class="admin-only">Manage</button>
+      <button data-tab="account">Account</button>
+    </nav>
+    <span class="grow"></span>
+    <button id="theme" class="themebtn" title="Switch light / dark"></button>
+    <select id="queue" title="Queue filter"></select>
+    <button id="syncBtn" class="primary admin-only">Sync matches</button>
+  </div>
+  <div id="syncStatus" class="syncbar" hidden></div>
+</header>
+<main id="view"></main>
+<script>(function(){var b=document.getElementById("theme"),r=document.documentElement;function s(){b.textContent=r.dataset.theme==="light"?"\u263E":"\u2600"}s();b.onclick=function(){r.dataset.theme=r.dataset.theme==="light"?"dark":"light";localStorage.setItem("premo-theme",r.dataset.theme);s()}})()</script>
+<script src="/static/app.js?v=57"></script>
+</body>
+</html>
